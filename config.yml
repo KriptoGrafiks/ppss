@@ -1,7 +1,7 @@
 zurg: v1
-token: yourtoken
-# host: "[::]"
-# port: 9999
+token: ${rd_token}
+host: "[::]"
+port: 9999
 # username:
 # password:
 # proxy:

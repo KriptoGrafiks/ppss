@@ -1,10 +1,10 @@
-version: '3.8'
-
 services:
   zurg:
     image: ghcr.io/debridmediamanager/zurg-testing:latest    
     container_name: zurg
     restart: unless-stopped
+    env_file: 
+    - .env
     ports:
       - 9999:9999
     volumes:
@@ -17,7 +17,7 @@ services:
     container_name: rclone
     restart: unless-stopped
     environment:
-      TZ: Europe/Berlin
+      TZ: Europe/Amsterdam
       PUID: 1000
       PGID: 1000
     volumes:
@@ -32,6 +32,27 @@ services:
     depends_on:
       - zurg
     command: "mount zurg: /data --allow-other --allow-non-empty --dir-cache-time 10s --vfs-cache-mode full"
+
+  plex:
+    image: linuxserver/plex:latest
+    container_name: plex
+    restart: unless-stopped
+    env_file: 
+    - .env
+    environment:
+      - TZ=Europe/Amsterdam # Replace with your timezone (e.g., Europe/Amsterdam)
+      - PLEX_CLAIM=${plex_claim} # Optional, replace with your Plex claim token if needed
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+    ports: 
+      - 32400:32400
+    volumes:
+      - /home/kg/plex/config:/config
+      - /home/kg/plex/transcode:/transcode
+      - /mnt/zurg:/data:ro  # Mount the `rclone` directory for Plex in read-only mode
+    depends_on:
+      - rclone
 
 volumes:
   zurgdata:
